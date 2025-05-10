@@ -1,0 +1,68 @@
+<!-- templates/products/product_list.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Products - CyberStore{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Products</h1>
+    
+    <div class="row">
+        <!-- Filters -->
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Categories</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'product_list' %}" class="list-group-item list-group-item-action {% if not selected_category %}active{% endif %}">
+                            All Products
+                        </a>
+                        {% for category in categories %}
+                            <a href="{% url 'category_products' category.slug %}" class="list-group-item list-group-item-action {% if selected_category == category.id %}active{% endif %}">
+                                {{ category.name }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Products -->
+        <div class="col-md-9">
+            <div class="row">
+                {% for product in products %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card product-card h-100">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="https://placehold.co/600x400" class="card-img-top" alt="No image available">
+                            {% endif %}
+
+                            <div class="card-body">
+                                <h5 class="card-title">{{ product.name }}</h5>
+                                <p class="card-text text-primary fw-bold">${{ product.price }}</p>
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-primary">View Details</a>
+                                    <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-cart-plus"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            No products found in this category.
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
