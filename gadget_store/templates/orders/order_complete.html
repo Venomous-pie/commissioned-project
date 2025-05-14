@@ -24,7 +24,7 @@
                             <h5 class="mb-0">Order Details</h5>
                         </div>
                         <div class="card-body">
-                            <p><strong>Order ID:</strong> {{ order.id }}</p>
+                            <p><strong>Order ID:</strong> {{ order_id }}</p>
                             <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
                             <p><strong>Status:</strong> <span class="badge bg-primary">{{ order.get_status_display }}</span></p>
                             <p><strong>Total Amount:</strong> ${{ order.get_total_cost }}</p>
