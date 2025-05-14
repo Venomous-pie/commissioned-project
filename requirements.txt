@@ -1,0 +1,11 @@
+Django>=5.2,<6.0
+Pillow>=10.0.0  # For image handling
+django-environ>=0.11.0  # For environment variable management
+django-crispy-forms>=2.1  # For better form rendering
+crispy-bootstrap5>=0.7  # Bootstrap 5 template pack for crispy-forms
+django-allauth>=0.57.0  # For authentication
+django-filter>=23.5  # For filtering products
+django-widget-tweaks>=1.5.0  # For form widget customization
+python-dotenv>=1.0.0  # For loading environment variables
+whitenoise>=6.6.0  # For serving static files
+gunicorn>=21.2.0  # For production deployment 
