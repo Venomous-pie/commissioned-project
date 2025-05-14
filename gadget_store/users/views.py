@@ -7,64 +7,55 @@ from django.contrib import messages
 from .forms import UserRegisterForm, UserLoginForm, ProfileUpdateForm
 from .models import Profile
 
-def register(request):
+def auth_view(request):
     if request.user.is_authenticated:
         return redirect('home')
-    
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            Profile.objects.create(user=user)
-            username = form.cleaned_data.get('username')
-            messages.success(request, f'Account created for {username}! You can now log in.')
-            return redirect('login')
-    else:
-        form = UserRegisterForm()
-    
-    return render(request, 'users/register.html', {'form': form})
 
-def user_login(request):
-    if request.user.is_authenticated:
-        return redirect('home')
-    
+    register_form = UserRegisterForm(prefix='register')
+    login_form = UserLoginForm(prefix='login')
+
     if request.method == 'POST':
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
-            
-            if user is not None:
-                login(request, user)
-                messages.success(request, f'Welcome back, {username}!')
-                
-                # Merge cart items if user had items in session cart
-                from cart.models import Cart, CartItem
-                if request.session.session_key:
-                    session_cart = Cart.objects.filter(session_id=request.session.session_key).first()
-                    if session_cart:
-                        user_cart, created = Cart.objects.get_or_create(user=user)
-                        
-                        for item in session_cart.items.all():
-                            try:
-                                user_item = CartItem.objects.get(cart=user_cart, product=item.product)
-                                user_item.quantity += item.quantity
-                                user_item.save()
-                            except CartItem.DoesNotExist:
-                                item.cart = user_cart
-                                item.save()
-                        
-                        session_cart.delete()
-                
-                next_url = request.GET.get('next')
-                return redirect(next_url if next_url else 'home')
-            else:
-                messages.error(request, 'Invalid username or password.')
-    else:
-        form = UserLoginForm()
-    
-    return render(request, 'users/login.html', {'form': form})
+        if 'register-submit' in request.POST:
+            register_form = UserRegisterForm(request.POST, prefix='register')
+            if register_form.is_valid():
+                user = register_form.save()
+                Profile.objects.create(user=user)
+                messages.success(request, f"Account created for {user.username}! You can now log in.")
+                return redirect('auth')  # Stay on same page for login
+        elif 'login-submit' in request.POST:
+            login_form = UserLoginForm(request.POST, prefix='login')
+            if login_form.is_valid():
+                username = login_form.cleaned_data.get('username')
+                password = login_form.cleaned_data.get('password')
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    login(request, user)
+                    messages.success(request, f"Welcome back, {username}!")
+
+                    # Merge cart logic
+                    if request.session.session_key:
+                        session_cart = Cart.objects.filter(session_id=request.session.session_key).first()
+                        if session_cart:
+                            user_cart, _ = Cart.objects.get_or_create(user=user)
+                            for item in session_cart.items.all():
+                                try:
+                                    user_item = CartItem.objects.get(cart=user_cart, product=item.product)
+                                    user_item.quantity += item.quantity
+                                    user_item.save()
+                                except CartItem.DoesNotExist:
+                                    item.cart = user_cart
+                                    item.save()
+                            session_cart.delete()
+                    
+                    next_url = request.GET.get('next')
+                    return redirect(next_url if next_url else '/')
+                else:
+                    messages.error(request, 'Invalid username or password.')
+
+    return render(request, 'users/auth.html', {
+        'register_form': register_form,
+        'login_form': login_form
+    })
 
 def user_logout(request):
     logout(request)

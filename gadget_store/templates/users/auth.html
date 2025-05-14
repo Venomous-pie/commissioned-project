@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberStore - Authentication</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0062cc;
+            --secondary: #5e72e4;
+            --dark: #1a1f36;
+            --light: #f8f9fa;
+            --border: #e6e8eb;
+            --text-muted: #8898aa;
+        }
+        
+        body {
+            background-color: #f7fafc;
+            color: #525f7f;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        
+        .auth-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+        
+        .auth-header {
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .auth-header h1 {
+            color: var(--dark);
+            font-weight: 600;
+        }
+        
+        .nav-tabs {
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .nav-tabs .nav-link {
+            color: var(--text-muted);
+            border: none;
+            padding: 1rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .nav-tabs .nav-link:hover {
+            color: var(--primary);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: var(--primary);
+            background-color: transparent;
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .form-control, .form-select {
+            background-color: #fff;
+            border: 1px solid var(--border);
+            color: #525f7f;
+            padding: 0.8rem 1rem;
+            font-size: 0.875rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(0, 98, 204, 0.15);
+            color: #525f7f;
+        }
+        
+        .form-label {
+            color: #525f7f;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0052b0;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0, 98, 204, 0.2);
+        }
+        
+        .btn-outline-secondary {
+            border-color: var(--border);
+            color: #525f7f;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #f7fafc;
+            color: var(--primary);
+        }
+        
+        .social-login {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            background-color: #fff;
+            border: 1px solid var(--border);
+            color: #525f7f;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            color: var(--primary);
+        }
+        
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+        
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .divider::before {
+            margin-right: 1rem;
+        }
+        
+        .divider::after {
+            margin-left: 1rem;
+        }
+        
+        .tech-pattern {
+            position: absolute;
+            opacity: 0.02;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .tech-pattern-1 {
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        
+        .form-floating > .form-control,
+        .form-floating > .form-select {
+            height: calc(3.5rem + 2px);
+            padding: 1rem 0.75rem;
+        }
+        
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: var(--text-muted);
+            z-index: 10;
+        }
+        
+        .password-field {
+            position: relative;
+        }
+        
+        .logo {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            color: white;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .form-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        .invalid-feedback {
+            font-size: 0.75rem;
+        }
+        
+        .form-check-label {
+            font-size: 0.875rem;
+        }
+        
+        a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        a:hover {
+            color: #0052b0;
+            text-decoration: underline;
+        }
+        
+        .footer-text {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+        
+        @media (max-width: 768px) {
+            .auth-container {
+                border-radius: 0;
+                margin: 0;
+                min-height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="auth-container p-4 p-md-5">
+                    <!-- Tech pattern background -->
+                    <div class="tech-pattern tech-pattern-1"></div>
+                    
+                    <!-- Header -->
+                    <div class="auth-header text-center mb-4">
+                        <div class="logo-container justify-content-center d-flex mb-3">
+                            <div class="logo">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h1 class="mb-0">CyberStore</h1>
+                        </div>
+                        <p class="text-muted">Access your account or create a new one</p>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs mb-4" id="authTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">
+                                Sign In
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">
+                                Create Account
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <!-- Tab content -->
+                    <div class="tab-content" id="authTabContent">
+                        <!-- Login Tab -->
+                        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                            <form id="loginForm" class="needs-validation" novalidate>
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="text" class="form-control" id="loginEmail" name="login-username" placeholder="Username or Email" required>
+                                        <label for="loginEmail">Username or Email</label>
+                                        <div class="invalid-feedback">
+                                            Please enter a valid username or email.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 password-field">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                                        <label for="loginPassword">Password</label>
+                                        <div class="invalid-feedback">
+                                            Please enter your password.
+                                        </div>
+                                    </div>
+                                    <span class="password-toggle" onclick="togglePassword('loginPassword', this)">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="rememberMe">
+                                        <label class="form-check-label text-muted" for="rememberMe">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                    <a href="#">Forgot password?</a>
+                                </div>
+                                
+                                <div class="d-grid mb-4">
+                                    <button type="submit" name="login-submit" class="btn btn-primary">
+                                        Sign In
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div class="divider">or continue with</div>
+                            
+                            <div class="social-login">
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-google"></i>
+                                </a>
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-apple"></i>
+                                </a>
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-microsoft"></i>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Register Tab -->
+                        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+                            <form id="registerForm" class="needs-validation" novalidate>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="firstName" placeholder="First Name" required>
+                                            <label for="firstName">First Name</label>
+                                            <div class="invalid-feedback">
+                                                First name is required.
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
+                                            <label for="lastName">Last Name</label>
+                                            <div class="invalid-feedback">
+                                                Last name is required.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        <input type="email" class="form-control" id="registerEmail" placeholder="name@example.com" required>
+                                        <label for="registerEmail">Email address</label>
+                                        <div class="invalid-feedback">
+                                            Please enter a valid email address.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3 password-field">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="registerPassword" placeholder="Password" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$">
+                                        <label for="registerPassword">Password</label>
+                                        <div class="invalid-feedback">
+                                            Password must be at least 8 characters and include uppercase, lowercase, number and special character.
+                                        </div>
+                                    </div>
+                                    <span class="password-toggle" onclick="togglePassword('registerPassword', this)">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                    <div class="form-text mt-1">
+                                        Must be at least 8 characters with uppercase, lowercase, number and special character.
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-4 password-field">
+                                    <div class="form-floating">
+                                        <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                                        <label for="confirmPassword">Confirm Password</label>
+                                        <div class="invalid-feedback">
+                                            Passwords do not match.
+                                        </div>
+                                    </div>
+                                    <span class="password-toggle" onclick="togglePassword('confirmPassword', this)">
+                                        <i class="far fa-eye"></i>
+                                    </span>
+                                </div>
+                                
+                                <div class="mb-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" value="" id="termsCheck" required>
+                                        <label class="form-check-label text-muted" for="termsCheck">
+                                            I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+                                        </label>
+                                        <div class="invalid-feedback">
+                                            You must agree to our terms and conditions.
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid mb-4">
+                                    <button type="submit" name="register-submit" class="btn btn-primary">
+                                        Create Account
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <div class="divider">or register with</div>
+                            
+                            <div class="social-login">
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-google"></i>
+                                </a>
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-apple"></i>
+                                </a>
+                                <a href="#" class="social-btn">
+                                    <i class="fab fa-microsoft"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <p class="footer-text">
+                        &copy; 2023 TechShop Inc. All rights reserved.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+    // Password visibility toggle
+    function togglePassword(inputId, icon) {
+        const input = document.getElementById(inputId);
+        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+        input.setAttribute('type', type);
+        
+        // Toggle eye icon
+        icon.innerHTML = type === 'text'
+            ? '<i class="far fa-eye-slash"></i>'
+            : '<i class="far fa-eye"></i>';
+    }
+
+    // Bootstrap-like form validation
+    (function () {
+        'use strict';
+
+        const forms = document.querySelectorAll('.needs-validation');
+
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+
+                form.classList.add('was-validated');
+            }, false);
+        });
+    })();
+</script>
+
+</body>
+</html>
