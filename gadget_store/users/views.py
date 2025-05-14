@@ -6,6 +6,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import UserRegisterForm, UserLoginForm, ProfileUpdateForm
 from .models import Profile
+from cart.models import *
+
 
 def auth_view(request):
     if request.user.is_authenticated:
@@ -18,17 +20,25 @@ def auth_view(request):
         if 'register-submit' in request.POST:
             register_form = UserRegisterForm(request.POST, prefix='register')
             if register_form.is_valid():
-                user = register_form.save()
+                user = register_form.save(commit=False)
+                user.first_name = register_form.cleaned_data.get('first_name')
+                user.last_name = register_form.cleaned_data.get('last_name')
+                user.save()
                 Profile.objects.create(user=user)
                 messages.success(request, f"Account created for {user.username}! You can now log in.")
-                return redirect('auth')  # Stay on same page for login
+                return redirect('auth')
+
         elif 'login-submit' in request.POST:
             login_form = UserLoginForm(request.POST, prefix='login')
             if login_form.is_valid():
                 username = login_form.cleaned_data.get('username')
                 password = login_form.cleaned_data.get('password')
+                messages.error(request, username)
+                messages.error(request, password)
+                
                 user = authenticate(username=username, password=password)
-                if user is not None:
+
+                if user:
                     login(request, user)
                     messages.success(request, f"Welcome back, {username}!")
 
@@ -46,11 +56,14 @@ def auth_view(request):
                                     item.cart = user_cart
                                     item.save()
                             session_cart.delete()
-                    
+
                     next_url = request.GET.get('next')
                     return redirect(next_url if next_url else '/')
                 else:
                     messages.error(request, 'Invalid username or password.')
+
+            else:
+                messages.error(request, login_form.errors)
 
     return render(request, 'users/auth.html', {
         'register_form': register_form,
