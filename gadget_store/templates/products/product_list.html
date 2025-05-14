@@ -160,7 +160,12 @@
                         <div class="card-footer bg-white pt-0 border-0">
                             <div class="product-card-footer">
                                 <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary w-100 me-1">Add to Cart</a>
-                                <button class="wishlist-btn" action="{% url 'add_to_wishlist' product.id %}"><i class="far fa-heart"></i></button>
+                                <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn wishlist-btn">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+                                </form>
                             </div>
                         </div>
                     </div>
