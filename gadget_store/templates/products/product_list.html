@@ -1,6 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<style>
+            .hero-section {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #1e293b 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+</style>
 <!-- Hero Section with Search -->
 <section class="hero-section text-white">
     <div class="container">
@@ -106,8 +114,8 @@
                         </div>
                         <div class="card-footer bg-white pt-0 border-0">
                             <div class="product-card-footer">
-                                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary">Add to Cart</a>
-                                <button class="wishlist-btn"><i class="far fa-heart"></i></button>
+                                <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary w-100 me-1">Add to Cart</a>
+                                <button class="wishlist-btn" action="{% url 'add_to_wishlist' product.id %}"><i class="far fa-heart"></i></button>
                             </div>
                         </div>
                     </div>
@@ -146,9 +154,4 @@
         </div>
     </div>
 </div>
-<<<<<<< HEAD
 {% endblock %}
-=======
-
-{% endblock %}
->>>>>>> 87e47f6f0e53e65842fa9a83315c8a57fecbe17e

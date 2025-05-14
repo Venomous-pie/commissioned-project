@@ -102,39 +102,6 @@
         transform: translateY(30px);
         animation: fadeInUp 0.8s ease forwards 0.4s;
     }
-
-    .btn-primary {
-        background-color: var(--primary-color);
-        border-color: var(--primary-color);
-        border-radius: 30px;
-        padding: 12px 30px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary:hover {
-        background-color: #0055b3;
-        border-color: #0055b3;
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(0, 102, 204, 0.3);
-    }
-
-    .btn-outline-light {
-        border-radius: 30px;
-        padding: 12px 30px;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        transition: all 0.3s ease;
-    }
-
-    .btn-outline-light:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
-    }
-
     /* Categories section */
     .categories-section {
         padding: 5rem 0;
@@ -206,104 +173,6 @@
         transform: translateX(5px);
     }
 
-    /* Featured products section */
-    .featured-section {
-        padding: 5rem 0;
-    }
-
-    .product-card {
-        border: none;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        transition: all 0.3s ease;
-        margin-bottom: 30px;
-    }
-
-    .product-card:hover {
-        transform: translateY(-10px);
-        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-    }
-
-    .product-img-wrapper {
-        height: 220px;
-        background-color: #f8f9fa;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        overflow: hidden;
-    }
-
-    .product-img {
-        max-height: 180px;
-        max-width: 100%;
-        transition: all 0.5s ease;
-    }
-
-    .product-card:hover .product-img {
-        transform: scale(1.1);
-    }
-
-    .product-badge {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        z-index: 10;
-        background-color: var(--accent-color);
-        color: white;
-        font-weight: 600;
-        padding: 5px 15px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-    }
-
-    .product-title {
-        font-size: 1.2rem;
-        font-weight: 600;
-        margin-top: 0.5rem;
-        margin-bottom: 0.5rem;
-        height: 2.8rem;
-        overflow: hidden;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-    }
-
-    .product-price {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--primary-color);
-        margin-bottom: 1rem;
-    }
-
-    .btn-product {
-        border-radius: 30px;
-        padding: 8px 20px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-
-    .btn-product:hover {
-        transform: translateY(-2px);
-    }
-
-    .btn-cart {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background-color: var(--primary-color);
-        color: white;
-        transition: all 0.3s ease;
-    }
-
-    .btn-cart:hover {
-        background-color: #0055b3;
-        transform: translateY(-2px);
-    }
 
     /* Testimonials section */
     .testimonials-section {
@@ -521,20 +390,20 @@
 
         <div class="row">
             {% for category in categories %}
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-6 col-md-6">
                 <div class="category-card fade-in-up">
-                    {% if category.name == 'Phones' %}
-                    <img src="/static/images/category-phones.jpg" alt="{{ category.name }}">
+                    {% if category.name == 'Smartphones' %}
+                    <img src="https://img.freepik.com/free-photo/bottom-view-diverse-group-friends-with-phones_23-2148212392.jpg?semt=ais_hybrid&w=740" alt="{{ category.name }}">
                     {% elif category.name == 'Laptops' %}
-                    <img src="/static/images/category-laptops.jpg" alt="{{ category.name }}">
+                    <img src="https://media.gettyimages.com/id/482114335/photo/hewlett-packard-co-laptops-sit-on-display-at-a-croma-electronics-megastore-operated-by-tata.jpg?s=612x612&w=0&k=20&c=le6UnQPbhBfrBi6fqlZfN1CHMdMRwdlzmGWWw2jad0Q=" alt="{{ category.name }}">
                     {% elif category.name == 'Tablets' %}
-                    <img src="/static/images/category-tablets.jpg" alt="{{ category.name }}">
-                    {% elif category.name == 'Accessories' %}
-                    <img src="/static/images/category-accessories.jpg" alt="{{ category.name }}">
+                    <img src="https://www.cnet.com/a/img/resize/3b5a8fd81bf857c4c7e7a99c92a62fe2747de3ae/hub/2025/02/12/96b06b65-d828-4390-b5d5-ec668f770316/lenovo-tab-plus-1.jpg?auto=webp&height=500" alt="{{ category.name }}">
+                    {% elif category.name == 'Mobile-accessories' %}
+                    <img src="https://t3.ftcdn.net/jpg/10/66/88/64/360_F_1066886445_g7GjAticfwUTcn0nLWRJuKeVLIj9AJik.jpg" alt="{{ category.name }}">
                     {% elif category.name == 'Wearables' %}
-                    <img src="/static/images/category-wearables.jpg" alt="{{ category.name }}">
+                    <img src="https://media.wired.com/photos/67b76a4bd4b862d1a8402b2e/16:9/w_800,h_450,c_limit/undefined" alt="{{ category.name }}">
                     {% elif category.name == 'Smart Home' %}
-                    <img src="/static/images/category-smarthome.jpg" alt="{{ category.name }}">
+                    <img src="https://m.media-amazon.com/images/G/01/us-manual-merchandising/Category_tile_TV_400x400_rework_EN.jpg" alt="{{ category.name }}">
                     {% else %}
                     <img src="/static/images/category-default.jpg" alt="{{ category.name }}">
                     {% endif %}
@@ -551,32 +420,54 @@
     </div>
 </section>
 
-<!-- Featured Products Section -->
-<section class="featured-section" id="featured">
+<<!-- Featured Products Section -->
+<section class="featured-section pb-5" id="featured">
     <div class="container">
         <h2 class="section-title">Featured Products</h2>
-        <p class="section-subtitle">Discover our handpicked selection of the latest and most innovative tech products
-            that are making waves in the industry.</p>
+        <p class="section-subtitle">
+            Discover our handpicked selection of the latest and most innovative tech products
+            that are making waves in the industry.
+        </p>
 
-        <div class="row">
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
             {% for product in featured_products %}
-            <div class="col-xl-3 col-lg-4 col-md-6">
-                <div class="product-card fade-in-up">
-                    {% if product.is_featured %}
-                    <span class="product-badge">Featured</span>
+            <div class="col">
+                <div class="card h-100 position-relative">
+                    {% if product.discount %}
+                    <span class="badge bg-danger badge-sale">{{ product.discount }}% OFF</span>
                     {% endif %}
-                    <div class="product-img-wrapper">
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-img">
-                    </div>
+                    {% if product.is_featured %}
+                    <span class="badge bg-primary featured-badge">Featured</span>
+                    {% endif %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
                     <div class="card-body">
-                        <h3 class="product-title">{{ product.name }}</h3>
-                        <p class="product-price">${{ product.price }}</p>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{% url 'product_detail' product.slug %}"
-                                class="btn btn-outline-primary btn-product">View Details</a>
-                            <a href="{% url 'add_to_cart' product.id %}" class="btn-cart">
-                                <i class="fas fa-cart-plus"></i>
-                            </a>
+                        <h5 class="card-title">{{ product.name }}</h5>
+                        <div class="rating-stars mb-2">
+                            {% for i in "12345"|slice:":product.rating" %}
+                                <i class="fas fa-star"></i>
+                            {% endfor %}
+                            {% for i in "12345"|slice:"product.rating:" %}
+                                <i class="far fa-star"></i>
+                            {% endfor %}
+                            <span class="ms-1 text-muted">({{ product.review_count }})</span>
+                        </div>
+                        <p class="card-text small text-muted mb-2">{{ product.description|truncatechars:50 }}</p>
+                        <div class="price-section mb-3">
+                            <span class="fw-bold fs-5">${{ product.price }}</span>
+                            {% if product.original_price %}
+                            <span class="original-price">${{ product.original_price }}</span>
+                            {% endif %}
+                        </div>
+                        <p class="stock-status {% if product.in_stock %}in-stock{% else %}text-danger{% endif %}">
+                            <i class="fas fa-check-circle me-1"></i> 
+                            {% if product.in_stock %}In Stock{% else %}Out of Stock{% endif %}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white pt-0 border-0">
+                        <div class="product-card-footer d-flex justify-content-between align-items-center">
+                            <a href="{% url 'add_to_cart' product.id %}" class="btn btn-sm btn-primary w-100 me-1">Add to Cart</a>
+                            <a href="{% url 'product_detail' product.slug %}" class="btn btn-sm btn-outline-secondary">Details</a>
+                            <button class="wishlist-btn"><i class="far fa-heart"></i></button>
                         </div>
                     </div>
                 </div>
@@ -589,6 +480,7 @@
         </div>
     </div>
 </section>
+
 
 <!-- Promo Banner Section -->
 <section class="promo-section py-5 bg-primary text-white">
@@ -610,8 +502,10 @@
 <section class="testimonials-section">
     <div class="container">
         <h2 class="section-title">What Our Customers Say</h2>
-        <p class="section-subtitle">Don't just take our word for it. Here's what our satisfied customers have to say
-            about their shopping experience with us.</p>
+        <p class="section-subtitle">
+            Don't just take our word for it. Here's what our satisfied customers have to say
+            about their shopping experience with us.
+        </p>
 
         <div class="row">
             <div class="col-lg-4 col-md-6">
@@ -619,7 +513,7 @@
                     <p class="testimonial-text">"The quality of the products is exceptional. I've been a loyal customer
                         for years and have never been disappointed. The customer service is also top-notch!"</p>
                     <div class="testimonial-author">
-                        <img src="/static/images/testimonial-1.jpg" alt="Customer" class="testimonial-avatar">
+                        <img src="https://picsum.photos/seed/sarah/80" alt="Customer" class="testimonial-avatar rounded-circle">
                         <div>
                             <p class="testimonial-name">Sarah Johnson</p>
                             <p class="testimonial-role">Tech Enthusiast</p>
@@ -627,12 +521,13 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-lg-4 col-md-6">
                 <div class="testimonial-card fade-in-up">
                     <p class="testimonial-text">"Fast shipping and the products always arrive in perfect condition. The
                         website is easy to navigate and the checkout process is seamless. Highly recommended!"</p>
                     <div class="testimonial-author">
-                        <img src="/static/images/testimonial-2.jpg" alt="Customer" class="testimonial-avatar">
+                        <img src="https://picsum.photos/seed/michael/80" alt="Customer" class="testimonial-avatar rounded-circle">
                         <div>
                             <p class="testimonial-name">Michael Chen</p>
                             <p class="testimonial-role">Software Developer</p>
@@ -640,13 +535,14 @@
                     </div>
                 </div>
             </div>
+
             <div class="col-lg-4 col-md-6">
                 <div class="testimonial-card fade-in-up">
                     <p class="testimonial-text">"I love how they keep up with the latest tech trends. Their product
                         selection is always up-to-date and the prices are competitive. My go-to store for all things
                         tech!"</p>
                     <div class="testimonial-author">
-                        <img src="/static/images/testimonial-3.jpg" alt="Customer" class="testimonial-avatar">
+                        <img src="https://picsum.photos/seed/emily/80" alt="Customer" class="testimonial-avatar rounded-circle">
                         <div>
                             <p class="testimonial-name">Emily Rodriguez</p>
                             <p class="testimonial-role">Digital Creator</p>
@@ -658,29 +554,31 @@
     </div>
 </section>
 
+
 <!-- Brands Section -->
 <section class="brands-section">
     <div class="container">
         <div class="row align-items-center justify-content-center">
             <div class="col-lg-2 col-md-3 col-4 text-center mb-4">
-                <img src="/static/images/brand-apple.png" alt="Apple" class="brand-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" class="brand-logo" style="max-height: 60px;">
             </div>
             <div class="col-lg-2 col-md-3 col-4 text-center mb-4">
-                <img src="/static/images/brand-samsung.png" alt="Samsung" class="brand-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Samsung_Logo.svg" alt="Samsung" class="brand-logo" style="max-height: 60px;">
             </div>
             <div class="col-lg-2 col-md-3 col-4 text-center mb-4">
-                <img src="/static/images/brand-sony.png" alt="Sony" class="brand-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ad/HP_logo_2012.svg" alt="HP" class="brand-logo" style="max-height: 60px;">
             </div>
             <div class="col-lg-2 col-md-3 col-4 text-center mb-4">
-                <img src="/static/images/brand-microsoft.png" alt="Microsoft" class="brand-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="brand-logo" style="max-height: 60px;">
             </div>
             <div class="col-lg-2 col-md-3 col-4 text-center mb-4">
-                <img src="/static/images/brand-google.png" alt="Google" class="brand-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google" class="brand-logo" style="max-height: 60px;">
             </div>
             <div class="col-lg-2 col-md-3 col-4 text-center mb-4">
-                <img src="/static/images/brand-dell.png" alt="Dell" class="brand-logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/48/Dell_Logo.svg" alt="Dell" class="brand-logo" style="max-height: 60px;">
             </div>
         </div>
+
     </div>
 </section>
 
@@ -693,7 +591,7 @@
         <div class="newsletter-form">
             <div class="input-group">
                 <input type="email" class="form-control newsletter-input" placeholder="Your email address">
-                <button class="btn newsletter-btn" type="button">Subscribe</button>
+                <button class="btn btn-primary" type="button">Subscribe</button>
             </div>
         </div>
     </div>

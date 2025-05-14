@@ -4,10 +4,16 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Category, Product, Wishlist
 from django.contrib import messages
+import random
+
 
 def home(request):
-    featured_products = Product.objects.filter(is_featured=True)[:8]
+    products = list(Product.objects.all())
+    random.shuffle(products)
+    featured_products = products[:8]  # get 8 random products
+
     categories = Category.objects.all()
+
     return render(request, 'products/home.html', {
         'featured_products': featured_products,
         'categories': categories
@@ -28,16 +34,20 @@ def product_list(request):
     })
 
 def product_detail(request, slug):
+    # Get the product
     product = get_object_or_404(Product, slug=slug)
-    is_in_wishlist = False
     
-    if request.user.is_authenticated:
-        is_in_wishlist = Wishlist.objects.filter(user=request.user, product=product).exists()
+    # Get related products (same category)
+    related_products = Product.objects.filter(
+        category=product.category
+    ).exclude(id=product.id)[:4]
     
-    return render(request, 'products/product_detail.html', {
+    context = {
         'product': product,
-        'is_in_wishlist': is_in_wishlist
-    })
+        'related_products': related_products,
+    }
+    
+    return render(request, 'products/product_detail.html', context)
 
 def category_products(request, slug):
     category = get_object_or_404(Category, slug=slug)

@@ -122,12 +122,6 @@ footer {
             font-weight: bold;
         }
         
-        .hero-section {
-            background: linear-gradient(135deg, var(--secondary-color) 0%, #1e293b 100%);
-            padding: 3rem 0;
-            margin-bottom: 2rem;
-        }
-        
         .search-bar {
             max-width: 600px;
             margin: 0 auto;
