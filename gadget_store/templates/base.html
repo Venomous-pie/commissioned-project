@@ -23,68 +23,101 @@
 </head>
 <body>
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg bg-dark text-white shadow-sm py-3" style="backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1);">
-        <div class="container">
-            <a class="navbar-brand text-info fw-bold" href="{% url 'home' %}">
-                <i class="fas fa-microchip me-2"></i>CyberStore
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'home' %}">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="{% url 'product_list' %}">Products</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" data-bs-toggle="dropdown">
-                            Categories
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-dark">
-                            {% for category in categories %}
-                                <li><a class="dropdown-item" href="{% url 'category_products' category.slug %}">{{ category.name }}</a></li>
-                            {% endfor %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm" style="backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <div class="container">
+        <!-- Logo -->
+        <a class="navbar-brand d-flex align-items-center text-info fw-bold" href="{% url 'home' %}">
+            <i class="fas fa-microchip me-2"></i>
+            CyberStore
+        </a>
 
+        <!-- Mobile Toggle Button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Content -->
+        <div class="collapse navbar-collapse" id="navbarContent">
+            <!-- Left Links -->
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home me-1"></i> Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'product_list' %}"><i class="fas fa-mobile-alt me-1"></i> Products</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-th-large me-1"></i> Categories
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        {% for category in categories %}
+                            <li><a class="dropdown-item" href="{% url 'category_products' category.slug %}">{{ category.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-tag me-1"></i> Deals</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><i class="fas fa-headset me-1"></i> Support</a>
+                </li>
+            </ul>
+
+            <!-- Right Side -->
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <!-- Search Modal Trigger -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
+                        <i class="fas fa-search"></i>
+                    </a>
+                </li>
+
+                <!-- Wishlist -->
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'wishlist' %}">
+                        <i class="far fa-heart"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                <!-- Cart -->
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'cart_detail' %}">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if cart_count > 0 %}
+                            <span class="badge rounded-pill bg-danger">{{ cart_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+
+                <!-- User Account -->
+                {% if user.is_authenticated %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-astronaut me-1"></i> {{ user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="{% url 'profile' %}"><i class="fas fa-user me-2"></i> Profile</a></li>
+                            <li><a class="dropdown-item" href="{% url 'wishlist' %}"><i class="far fa-heart me-2"></i> Wishlist</a></li>
+                            <li><a class="dropdown-item" href="{% url 'order_history' %}"><i class="fas fa-box me-2"></i> Orders</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
                         </ul>
                     </li>
-                </ul>
-                <ul class="navbar-nav ms-auto">
+                {% else %}
                     <li class="nav-item">
-                        <a class="nav-link text-white position-relative" href="{% url 'cart_detail' %}">
-                            <i class="fas fa-shopping-cart"></i> Cart
-                            {% if cart_count > 0 %}
-                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ cart_count }}</span>
-                            {% endif %}
-                        </a>
+                        <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-sign-in-alt me-1"></i> Login</a>
                     </li>
-                    {% if user.is_authenticated %}
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-white" href="#" id="userDropdown" data-bs-toggle="dropdown">
-                                <i class="fas fa-user-astronaut"></i> {{ user.username }}
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="{% url 'profile' %}">Profile</a></li>
-                                <li><a class="dropdown-item" href="{% url 'wishlist' %}">Wishlist</a></li>
-                                <li><a class="dropdown-item" href="{% url 'order_history' %}">Orders</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-                            </ul>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="{% url 'register' %}">Register</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'register' %}"><i class="fas fa-user-plus me-1"></i> Register</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
 
     <!-- Messages -->
