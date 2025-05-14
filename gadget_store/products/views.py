@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required
 from .models import Category, Product, Wishlist
 from django.contrib import messages
 import random
+from django.db import models
+from django.http import JsonResponse
 
 
 def home(request):
@@ -23,14 +25,46 @@ def product_list(request):
     products = Product.objects.all()
     categories = Category.objects.all()
     category_id = request.GET.get('category')
+    search_query = request.GET.get('q')
+    sort = request.GET.get('sort', 'featured')
     
+    # Apply search filter
+    if search_query:
+        products = products.filter(
+            models.Q(name__icontains=search_query) |
+            models.Q(description__icontains=search_query) |
+            models.Q(tags__icontains=search_query) |
+            models.Q(brand__icontains=search_query)
+        )
+    
+    # Apply category filter
     if category_id:
         products = products.filter(category__id=category_id)
+    
+    # Apply sorting
+    if sort == 'price_asc':
+        products = products.order_by('price')
+    elif sort == 'price_desc':
+        products = products.order_by('-price')
+    elif sort == 'newest':
+        products = products.order_by('-created')
+    elif sort == 'rating':
+        products = products.order_by('-rating')
+    else:  # featured
+        products = products.order_by('-is_featured', '-created')
+    
+    # Get total products count for the sidebar
+    total_products = Product.objects.count()
+    
+    # Add product count to categories
+    for category in categories:
+        category.product_count = Product.objects.filter(category=category).count()
     
     return render(request, 'products/product_list.html', {
         'products': products,
         'categories': categories,
-        'selected_category': int(category_id) if category_id else None
+        'selected_category': int(category_id) if category_id else None,
+        'total_products': total_products
     })
 
 def product_detail(request, slug):
@@ -84,3 +118,28 @@ def remove_from_wishlist(request, product_id):
 def wishlist(request):
     wishlist_items = Wishlist.objects.filter(user=request.user)
     return render(request, 'products/wishlist.html', {'wishlist_items': wishlist_items})
+
+def search_suggestions(request):
+    query = request.GET.get('q', '')
+    if len(query) < 2:
+        return JsonResponse({'suggestions': []})
+    
+    products = Product.objects.filter(
+        models.Q(name__icontains=query) |
+        models.Q(description__icontains=query) |
+        models.Q(tags__icontains=query) |
+        models.Q(brand__icontains=query)
+    )[:5]  # Limit to 5 suggestions
+    
+    suggestions = []
+    for product in products:
+        suggestions.append({
+            'id': product.id,
+            'name': product.name,
+            'price': str(product.price),
+            'image_url': product.image.url if product.image else '',
+            'category': product.category.name,
+            'url': product.get_absolute_url()
+        })
+    
+    return JsonResponse({'suggestions': suggestions})

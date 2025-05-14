@@ -70,4 +70,67 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Search Suggestions
+    const searchInput = document.querySelector('.search-input');
+    const suggestionsContainer = document.querySelector('.search-suggestions');
+    let debounceTimer;
+
+    // Show suggestions container when input is focused
+    searchInput.addEventListener('focus', function() {
+        if (this.value.length >= 2) {
+            suggestionsContainer.style.display = 'block';
+        }
+    });
+
+    // Hide suggestions container when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-container')) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    // Handle input changes
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        // Debounce the API call
+        debounceTimer = setTimeout(() => {
+            fetch(`/search-suggestions/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.suggestions.length > 0) {
+                        suggestionsContainer.innerHTML = data.suggestions.map(product => `
+                            <a href="${product.url}" class="suggestion-item text-decoration-none">
+                                <img src="${product.image_url}" alt="${product.name}" class="suggestion-img">
+                                <div class="suggestion-content">
+                                    <div class="suggestion-title">${product.name}</div>
+                                    <div class="suggestion-category">${product.category}</div>
+                                </div>
+                                <div class="suggestion-price">$${product.price}</div>
+                            </a>
+                        `).join('');
+                        suggestionsContainer.style.display = 'block';
+                    } else {
+                        suggestionsContainer.innerHTML = `
+                            <div class="suggestion-item">
+                                <div class="suggestion-content">
+                                    <div class="suggestion-title text-muted">No products found</div>
+                                </div>
+                            </div>
+                        `;
+                        suggestionsContainer.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                });
+        }, 300); // Wait 300ms after user stops typing
+    });
 });

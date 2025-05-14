@@ -63,11 +63,17 @@
 
             <!-- Right Side -->
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                <!-- Search Modal Trigger -->
-                <li class="nav-item">
-                    <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#searchModal">
-                        <i class="fas fa-search"></i>
-                    </a>
+                <!-- Expandable Search Bar -->
+                <li class="nav-item search-container">
+                    <form action="{% url 'product_list' %}" method="get" class="search-form">
+                        <div class="input-group">
+                            <input type="text" name="q" class="form-control search-input" placeholder="Search products..." autocomplete="off">
+                            <button type="submit" class="btn btn-link search-btn">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <div class="search-suggestions"></div>
+                    </form>
                 </li>
 
                 <!-- Wishlist -->

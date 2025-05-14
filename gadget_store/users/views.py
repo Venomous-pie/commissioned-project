@@ -7,6 +7,7 @@ from django.contrib import messages
 from .forms import UserRegisterForm, UserLoginForm, ProfileUpdateForm
 from .models import Profile
 from cart.models import *
+from django.contrib.auth.models import User
 
 
 def auth_view(request):
@@ -34,9 +35,6 @@ def auth_view(request):
                 identifier = login_form.cleaned_data.get('username_login')
                 password = login_form.cleaned_data.get('password_login')
 
-                print("identifier:", identifier)
-                print("password:", password)
-
                 # Attempt to get user by username or email
                 try:
                     user_obj = User.objects.get(username=identifier)
@@ -44,37 +42,39 @@ def auth_view(request):
                     try:
                         user_obj = User.objects.get(email=identifier)
                     except User.DoesNotExist:
-                        user_obj = None
+                        login_form.add_error('username_login', 'No account found with this username or email.')
+                        return render(request, 'users/auth.html', {
+                            'register_form': register_form,
+                            'login_form': login_form
+                        })
 
                 if user_obj:
                     user = authenticate(request, username=user_obj.username, password=password)
+                    if user:
+                        login(request, user)
+                        messages.success(request, f"Welcome back, {user.username}!")
+
+                        # Merge cart logic
+                        if request.session.session_key:
+                            session_cart = Cart.objects.filter(session_id=request.session.session_key).first()
+                            if session_cart:
+                                user_cart, _ = Cart.objects.get_or_create(user=user)
+                                for item in session_cart.items.all():
+                                    try:
+                                        user_item = CartItem.objects.get(cart=user_cart, product=item.product)
+                                        user_item.quantity += item.quantity
+                                        user_item.save()
+                                    except CartItem.DoesNotExist:
+                                        item.cart = user_cart
+                                        item.save()
+                                session_cart.delete()
+
+                        next_url = request.GET.get('next')
+                        return redirect(next_url if next_url else '/')
+                    else:
+                        login_form.add_error('password_login', 'Incorrect password. Please try again.')
                 else:
-                    user = None
-
-                print(user)
-                if user:
-                    login(request, user)
-                    messages.success(request, f"Welcome back, {user.username}!")
-
-                    # Merge cart logic
-                    if request.session.session_key:
-                        session_cart = Cart.objects.filter(session_id=request.session.session_key).first()
-                        if session_cart:
-                            user_cart, _ = Cart.objects.get_or_create(user=user)
-                            for item in session_cart.items.all():
-                                try:
-                                    user_item = CartItem.objects.get(cart=user_cart, product=item.product)
-                                    user_item.quantity += item.quantity
-                                    user_item.save()
-                                except CartItem.DoesNotExist:
-                                    item.cart = user_cart
-                                    item.save()
-                            session_cart.delete()
-
-                    next_url = request.GET.get('next')
-                    return redirect(next_url if next_url else '/')
-                else:
-                    login_form.add_error('username_login', 'Invalid username/email or password.')
+                    login_form.add_error('username_login', 'No account found with this username or email.')
 
             else:
                 messages.error(request, 'Please correct the errors in the form.')
