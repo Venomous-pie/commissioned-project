@@ -259,18 +259,6 @@
 
     <div class="container py-5">
         <div class="row justify-content-center">
-        {% if messages %}
-            <div class="alert alert-info alert-dismissible fade show" role="alert">
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <!-- Dismiss Button -->
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
             <div class="col-lg-8 col-xl-7">
                 <div class="auth-container p-4 p-md-5">
                     <!-- Tech pattern background -->
@@ -309,22 +297,26 @@
                                 {% csrf_token %}
                                 
                                 <div class="mb-3">
-                                    <div class="form-floating">
-                                        <input type="text" class="form-control" id="loginEmail" name="login-username" placeholder="Username or Email" required>
-                                        <label for="loginEmail">Username or Email</label>
-                                        <div class="invalid-feedback">
-                                            Please enter a valid username or email.
-                                        </div>
+                                    <div class="form-floating mb-3">
+                                        {{ login_form.username_login }}
+                                        <label for="{{ login_form.username.id_for_label }}">Username or Email</label>
+                                        {% if login_form.username_login.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ login_form.username_login.errors.0 }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 </div>
                                 
                                 <div class="mb-3 password-field">
-                                    <div class="form-floating">
-                                        <input type="password" class="form-control" id="loginPassword" name="login-password" placeholder="Password" required>
-                                        <label for="loginPassword">Password</label>
-                                        <div class="invalid-feedback">
-                                            Please enter your password.
-                                        </div>
+                                    <div class="form-floating mb-3">
+                                        {{ login_form.password_login }}
+                                        <label for="{{ login_form.password.id_for_label }}">Password</label>
+                                        {% if login_form.password_login.errors %}
+                                            <div class="invalid-feedback d-block">
+                                                {{ login_form.password_login.errors.0 }}
+                                            </div>
+                                        {% endif %}
                                     </div>
                                     <span class="password-toggle" onclick="togglePassword('loginPassword', this)">
                                         <i class="far fa-eye"></i>
@@ -368,12 +360,13 @@
                         
                         <!-- Register Tab -->
                         <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-                            <form id="registerForm" class="needs-validation" novalidate>
+                            <form method="post" id="registerForm" class="needs-validation" novalidate>
+                                {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="firstName" placeholder="First Name" required>
-                                            <label for="firstName">First Name</label>
+                                            {{ register_form.first_name }}
+                                            <label for="{{ register_form.first_name.id_for_label }}">First Name</label>
                                             <div class="invalid-feedback">
                                                 First name is required.
                                             </div>
@@ -381,25 +374,35 @@
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <div class="form-floating">
-                                            <input type="text" class="form-control" id="lastName" placeholder="Last Name" required>
-                                            <label for="lastName">Last Name</label>
+                                            {{ register_form.last_name }}
+                                            <label for="{{ register_form.last_name.id_for_label }}">Last Name</label>
                                             <div class="invalid-feedback">
                                                 Last name is required.
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <div class="form-floating">
-                                        <input type="email" class="form-control" id="registerEmail" placeholder="name@example.com" required>
-                                        <label for="registerEmail">Email address</label>
+                                        {{ register_form.email }}
+                                        <label for="{{ register_form.email.id_for_label }}">Email address</label>
                                         <div class="invalid-feedback">
                                             Please enter a valid email address.
                                         </div>
                                     </div>
                                 </div>
-                                
+
+                                <div class="mb-3">
+                                    <div class="form-floating">
+                                        {{ register_form.username }}
+                                        <label for="{{ register_form.username.id_for_label }}">Username</label>
+                                        <div class="invalid-feedback">
+                                            Username is required.
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <div class="mb-3 password-field">
                                     <div class="form-floating">
                                         {{ register_form.password1 }}
@@ -428,7 +431,7 @@
                                         <i class="far fa-eye"></i>
                                     </span>
                                 </div>
-                                
+
                                 <div class="mb-4">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" value="" id="termsCheck" required>
@@ -440,13 +443,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="d-grid mb-4">
                                     <button type="submit" name="register-submit" class="btn btn-primary">
                                         Create Account
                                     </button>
                                 </div>
                             </form>
+
                             
                             <div class="divider">or register with</div>
                             

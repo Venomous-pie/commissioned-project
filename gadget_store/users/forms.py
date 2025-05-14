@@ -22,12 +22,26 @@ class UserRegisterForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
-        self.fields['password1'].widget.attrs['class'] = 'form-control'
-        self.fields['password2'].widget.attrs['class'] = 'form-control'
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['placeholder'] = field.label  # required for floating labels
 
 class UserLoginForm(forms.Form):
-    username = forms.CharField(widget=forms.TextInput(attrs={'class': 'form-control'}), label="Username or Email")
-    password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+    username_login = forms.CharField(
+        label="Username or Email",
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Username or Email'
+        })
+    )
+    password_login = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Password',
+            'id': 'loginPassword'
+        })
+    )
+
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:

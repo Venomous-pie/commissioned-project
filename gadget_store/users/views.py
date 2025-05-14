@@ -31,16 +31,30 @@ def auth_view(request):
         elif 'login-submit' in request.POST:
             login_form = UserLoginForm(request.POST, prefix='login')
             if login_form.is_valid():
-                username = login_form.cleaned_data.get('username')
-                password = login_form.cleaned_data.get('password')
-                messages.error(request, username)
-                messages.error(request, password)
-                
-                user = authenticate(username=username, password=password)
+                identifier = login_form.cleaned_data.get('username_login')
+                password = login_form.cleaned_data.get('password_login')
 
+                print("identifier:", identifier)
+                print("password:", password)
+
+                # Attempt to get user by username or email
+                try:
+                    user_obj = User.objects.get(username=identifier)
+                except User.DoesNotExist:
+                    try:
+                        user_obj = User.objects.get(email=identifier)
+                    except User.DoesNotExist:
+                        user_obj = None
+
+                if user_obj:
+                    user = authenticate(request, username=user_obj.username, password=password)
+                else:
+                    user = None
+
+                print(user)
                 if user:
                     login(request, user)
-                    messages.success(request, f"Welcome back, {username}!")
+                    messages.success(request, f"Welcome back, {user.username}!")
 
                     # Merge cart logic
                     if request.session.session_key:
@@ -60,10 +74,10 @@ def auth_view(request):
                     next_url = request.GET.get('next')
                     return redirect(next_url if next_url else '/')
                 else:
-                    messages.error(request, 'Invalid username or password.')
+                    login_form.add_error('username_login', 'Invalid username/email or password.')
 
             else:
-                messages.error(request, login_form.errors)
+                messages.error(request, 'Please correct the errors in the form.')
 
     return render(request, 'users/auth.html', {
         'register_form': register_form,
