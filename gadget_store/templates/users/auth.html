@@ -274,7 +274,14 @@
                         </div>
                         <p class="text-muted">Access your account or create a new one</p>
                     </div>
-                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
                     <!-- Tabs -->
                     <ul class="nav nav-tabs mb-4" id="authTab" role="tablist">
                         <li class="nav-item" role="presentation">
@@ -450,7 +457,7 @@
                                 </div>
 
                                 <div class="d-grid mb-4">
-                                    <button type="submit" name="register-submit" class="btn btn-primary">
+                                    <button type="submit" name="register-submit" value="1" class="btn btn-primary">
                                         Create Account
                                     </button>
                                 </div>

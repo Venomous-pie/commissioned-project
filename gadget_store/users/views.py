@@ -22,12 +22,17 @@ def auth_view(request):
             register_form = UserRegisterForm(request.POST, prefix='register')
             if register_form.is_valid():
                 user = register_form.save(commit=False)
-                user.first_name = register_form.cleaned_data.get('first_name')
-                user.last_name = register_form.cleaned_data.get('last_name')
+                user.first_name = register_form.cleaned_data['first_name']
+                user.last_name = register_form.cleaned_data['last_name']
+                user.email = register_form.cleaned_data['email']
                 user.save()
                 Profile.objects.create(user=user)
-                messages.success(request, f"Account created for {user.username}! You can now log in.")
+                # messages.success(request, f"Account created for {user.username}! You can now log in.")
+                messages.success(request, register_form.errors)
+
                 return redirect('auth')
+            else:
+                messages.error(request, register_form.errors)
 
         elif 'login-submit' in request.POST:
             login_form = UserLoginForm(request.POST, prefix='login')
