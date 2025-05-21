@@ -86,6 +86,21 @@
               {% endif %}
             </button>
           </div>
+          {% if user.is_authenticated %}
+          <div class="col-auto">
+            <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="d-inline">
+              {% csrf_token %}
+              <button type="submit" class="btn {% if product.id in in_wishlist_products %}btn-danger{% else %}btn-outline-danger{% endif %}">
+                <i class="{% if product.id in in_wishlist_products %}fas{% else %}far{% endif %} fa-heart me-2"></i>
+                {% if product.id in in_wishlist_products %}
+                  In Wishlist
+                {% else %}
+                  Add to Wishlist
+                {% endif %}
+              </button>
+            </form>
+          </div>
+          {% endif %}
         </div>
       </form>
       

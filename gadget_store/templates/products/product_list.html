@@ -169,7 +169,11 @@
                                 <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="d-inline">
                                     {% csrf_token %}
                                     <button type="submit" class="btn wishlist-btn">
-                                        <i class="far fa-heart"></i>
+                                        {% if product.id in in_wishlist_products %}
+                                            <i class="fas fa-heart text-danger"></i>
+                                        {% else %}
+                                            <i class="far fa-heart"></i>
+                                        {% endif %}
                                     </button>
                                 </form>
                             </div>

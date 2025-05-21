@@ -101,8 +101,30 @@ def add_to_wishlist(request, product_id):
     
     if created:
         messages.success(request, f"{product.name} added to your wishlist!")
+        status_message = f"{product.name} added to your wishlist!"
+        in_wishlist = True
     else:
-        messages.info(request, f"{product.name} is already in your wishlist!")
+        # If it already exists, remove it (toggle behavior)
+        wishlist_item.delete()
+        messages.info(request, f"{product.name} removed from your wishlist!")
+        status_message = f"{product.name} removed from your wishlist!"
+        in_wishlist = False
+    
+    # If this is an AJAX request, return JSON response
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        # Get updated wishlist count
+        wishlist_count = Wishlist.objects.filter(user=request.user).count()
+        return JsonResponse({
+            'status': 'success',
+            'message': status_message,
+            'in_wishlist': in_wishlist,
+            'wishlist_count': wishlist_count
+        })
+    
+    # For non-AJAX requests, redirect to the referring page if possible
+    referer = request.META.get('HTTP_REFERER')
+    if referer:
+        return redirect(referer)
     
     return redirect('product_detail', slug=product.slug)
 

@@ -57,6 +57,7 @@ TEMPLATES = [
                 'cart.context_processors.cart_count',
                 'cart.context_processors.cart_contents',
                 'products.context_processor.categories_processor',
+                'products.context_processor.wishlist_processor',
             ],
         },
     },

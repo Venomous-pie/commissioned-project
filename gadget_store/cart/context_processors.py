@@ -1,13 +1,25 @@
 def cart_count(request):
-    cart = request.session.get('cart', {})
-    return {
-        'cart_count': sum(item['quantity'] for item in cart.values())
-    }
+    from .models import Cart
+    
+    count = 0
+    if request.user.is_authenticated:
+        try:
+            cart = Cart.objects.get(user=request.user)
+            count = sum(item.quantity for item in cart.items.all())
+        except Cart.DoesNotExist:
+            count = 0
+    elif hasattr(request, 'session') and request.session.session_key:
+        session_id = request.session.session_key
+        try:
+            cart = Cart.objects.get(session_id=session_id)
+            count = sum(item.quantity for item in cart.items.all())
+        except Cart.DoesNotExist:
+            count = 0
+    
+    return {'cart_count': count}
 
 def cart_contents(request):
-    cart = request.session.get('cart', {})
     cart_items = []
-    total = 0
     
     from products.models import Product
     from .models import Cart, CartItem
