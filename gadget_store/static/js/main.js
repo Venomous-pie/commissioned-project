@@ -157,7 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Item added to wishlist
                     if (icon) {
                         icon.classList.remove('far');
-                        icon.classList.add('fas', 'text-danger');
+                        icon.classList.add('fas');
+                        icon.classList.add('text-danger');
                     }
                     // If we have text in the button, update it
                     if (button.textContent.trim().length > 0) {
@@ -174,7 +175,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Item removed from wishlist
                     if (icon) {
-                        icon.classList.remove('fas', 'text-danger');
+                        icon.classList.remove('fas');
+                        icon.classList.remove('text-danger');
                         icon.classList.add('far');
                     }
                     // If we have text in the button, update it
@@ -219,9 +221,11 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function(e) {
             // Don't apply this if we're already handling with AJAX
             if (button.closest('form[action^="/add-to-wishlist/"]')) {
+                // Don't toggle the icon here since the AJAX response will handle it
                 return;
             }
             
+            // For non-AJAX fallback - this code should rarely execute
             const icon = this.querySelector('i');
             if (icon.classList.contains('far')) {
                 icon.classList.remove('far');

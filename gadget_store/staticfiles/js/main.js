@@ -1,6 +1,80 @@
 /* static/js/main.js */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart AJAX functionality
+    const addToCartLinks = document.querySelectorAll('a[href^="/cart/add/"]');
+    addToCartLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Create a form to submit the data
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = this.href;
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = document.querySelector('#csrf-form input[name="csrfmiddlewaretoken"]').value;
+            form.appendChild(csrfInput);
+            
+            // Add quantity
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = 'quantity';
+            quantityInput.value = '1';
+            form.appendChild(quantityInput);
+            
+            // Submit the form with AJAX
+            const formData = new FormData(form);
+            fetch(this.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update cart badge
+                const cartBadge = document.querySelector('.navbar .fa-shopping-cart').nextElementSibling;
+                if (data.cart_count > 0) {
+                    if (cartBadge) {
+                        cartBadge.textContent = data.cart_count;
+                    } else {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'badge rounded-pill bg-danger';
+                        newBadge.textContent = data.cart_count;
+                        document.querySelector('.navbar .fa-shopping-cart').after(newBadge);
+                    }
+                }
+                
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = '<strong>Success!</strong> Item added to your cart.' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                document.querySelector('main').prepend(alertDiv);
+                
+                // Update button text to "Add More"
+                this.textContent = 'Add More';
+                
+                // Automatically close the alert after 3 seconds
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert');
+                    if (alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+            });
+        });
+    });
+
     // Add fade-in animation to main content
     const mainContent = document.querySelector('main');
     if (mainContent) {
@@ -54,10 +128,104 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Wishlist toggle animation
+    // Wishlist toggle with AJAX
+    const wishlistForms = document.querySelectorAll('form[action^="/add-to-wishlist/"]');
+    wishlistForms.forEach(form => {
+        form.addEventListener('submit', function(e) {
+            // Only handle if the user is logged in (form exists)
+            e.preventDefault();
+            
+            // Get the button and icon
+            const button = this.querySelector('button');
+            const icon = button.querySelector('i');
+            
+            // Create form data for submission
+            const formData = new FormData(this);
+            
+            // Submit the form with AJAX
+            fetch(this.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update UI based on response
+                if (data.in_wishlist) {
+                    // Item added to wishlist
+                    if (icon) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        icon.classList.add('text-danger');
+                    }
+                    // If we have text in the button, update it
+                    if (button.textContent.trim().length > 0) {
+                        button.classList.remove('btn-outline-danger');
+                        button.classList.add('btn-danger');
+                        // Find text node and update it
+                        for (let node of button.childNodes) {
+                            if (node.nodeType === 3) { // Text node
+                                node.textContent = ' In Wishlist';
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    // Item removed from wishlist
+                    if (icon) {
+                        icon.classList.remove('fas');
+                        icon.classList.remove('text-danger');
+                        icon.classList.add('far');
+                    }
+                    // If we have text in the button, update it
+                    if (button.textContent.trim().length > 0) {
+                        button.classList.remove('btn-danger');
+                        button.classList.add('btn-outline-danger');
+                        // Find text node and update it
+                        for (let node of button.childNodes) {
+                            if (node.nodeType === 3) { // Text node
+                                node.textContent = ' Add to Wishlist';
+                                break;
+                            }
+                        }
+                    }
+                }
+                
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = '<strong>Success!</strong> ' + data.message +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                document.querySelector('main').prepend(alertDiv);
+                
+                // Automatically close the alert after 3 seconds
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert');
+                    if (alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Error updating wishlist:', error);
+            });
+        });
+    });
+    
+    // Wishlist toggle animation (for non-AJAX fallback)
     const wishlistButtons = document.querySelectorAll('.wishlist-btn');
     wishlistButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function(e) {
+            // Don't apply this if we're already handling with AJAX
+            if (button.closest('form[action^="/add-to-wishlist/"]')) {
+                // Don't toggle the icon here since the AJAX response will handle it
+                return;
+            }
+            
+            // For non-AJAX fallback - this code should rarely execute
             const icon = this.querySelector('i');
             if (icon.classList.contains('far')) {
                 icon.classList.remove('far');
