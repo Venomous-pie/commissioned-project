@@ -7,9 +7,36 @@ from .models import Cart, CartItem
 from django.http import JsonResponse
 
 def _get_cart(request):
+    """
+    Get or create a cart based on user authentication status
+    If user is authenticated, associate cart with the user
+    Otherwise, associate cart with session ID
+    """
     if request.user.is_authenticated:
+        # For authenticated users, get or create their cart
         cart, created = Cart.objects.get_or_create(user=request.user)
+        
+        # If we found a cart tied to the session ID and it's different from the user cart,
+        # we should merge them and delete the session cart
+        if hasattr(request, 'session') and request.session.session_key:
+            session_cart = Cart.objects.filter(session_id=request.session.session_key).first()
+            if session_cart and session_cart.id != cart.id:
+                # Merge items from session cart to user cart
+                for item in session_cart.items.all():
+                    try:
+                        user_item = CartItem.objects.get(cart=cart, product=item.product)
+                        user_item.quantity += item.quantity
+                        user_item.save()
+                    except CartItem.DoesNotExist:
+                        item.cart = cart
+                        item.save()
+                session_cart.delete()
     else:
+        # For anonymous users, use session ID
+        if not hasattr(request, 'session'):
+            # This should never happen, but just in case
+            return Cart.objects.create()
+            
         session_id = request.session.session_key
         if not session_id:
             request.session.create()

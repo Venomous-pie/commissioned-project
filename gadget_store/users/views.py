@@ -27,12 +27,12 @@ def auth_view(request):
                 user.email = register_form.cleaned_data['email']
                 user.save()
                 Profile.objects.create(user=user)
-                # messages.success(request, f"Account created for {user.username}! You can now log in.")
-                messages.success(request, register_form.errors)
-
+                messages.success(request, f"Account created for {user.username}! You can now log in.")
                 return redirect('auth')
             else:
-                messages.error(request, register_form.errors)
+                for field, errors in register_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
 
         elif 'login-submit' in request.POST:
             login_form = UserLoginForm(request.POST, prefix='login')
@@ -82,7 +82,9 @@ def auth_view(request):
                     login_form.add_error('username_login', 'No account found with this username or email.')
 
             else:
-                messages.error(request, 'Please correct the errors in the form.')
+                for field, errors in login_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
 
     return render(request, 'users/auth.html', {
         'register_form': register_form,

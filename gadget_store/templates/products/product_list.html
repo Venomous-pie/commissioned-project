@@ -168,7 +168,7 @@
                                 </a>
                                 <form method="post" action="{% url 'add_to_wishlist' product.id %}" class="d-inline">
                                     {% csrf_token %}
-                                    <button type="submit" class="btn wishlist-btn">
+                                    <button type="submit" class="btn wishlist-btn" {% if not user.is_authenticated %}onclick="location.href='{% url 'auth' %}?next={{ request.path }}'; return false;"{% endif %}>
                                         {% if product.id in in_wishlist_products %}
                                             <i class="fas fa-heart text-danger"></i>
                                         {% else %}

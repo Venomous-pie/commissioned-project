@@ -96,37 +96,52 @@ def category_products(request, slug):
 
 @login_required
 def add_to_wishlist(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
-    
-    if created:
-        messages.success(request, f"{product.name} added to your wishlist!")
-        status_message = f"{product.name} added to your wishlist!"
-        in_wishlist = True
-    else:
-        # If it already exists, remove it (toggle behavior)
-        wishlist_item.delete()
-        messages.info(request, f"{product.name} removed from your wishlist!")
-        status_message = f"{product.name} removed from your wishlist!"
-        in_wishlist = False
-    
-    # If this is an AJAX request, return JSON response
-    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+    try:
+        product = get_object_or_404(Product, id=product_id)
+        wishlist_item, created = Wishlist.objects.get_or_create(user=request.user, product=product)
+        
+        if created:
+            status_message = f"{product.name} added to your wishlist!"
+            in_wishlist = True
+            messages.success(request, status_message)
+        else:
+            # If it already exists, remove it (toggle behavior)
+            wishlist_item.delete()
+            status_message = f"{product.name} removed from your wishlist!"
+            in_wishlist = False
+            messages.info(request, status_message)
+        
         # Get updated wishlist count
         wishlist_count = Wishlist.objects.filter(user=request.user).count()
-        return JsonResponse({
-            'status': 'success',
-            'message': status_message,
-            'in_wishlist': in_wishlist,
-            'wishlist_count': wishlist_count
-        })
+        
+        # If this is an AJAX request, return JSON response
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'success',
+                'message': status_message,
+                'in_wishlist': in_wishlist,
+                'wishlist_count': wishlist_count
+            })
+        
+        # For non-AJAX requests, redirect to the referring page if possible
+        referer = request.META.get('HTTP_REFERER')
+        if referer:
+            return redirect(referer)
+        
+        return redirect('product_detail', slug=product.slug)
     
-    # For non-AJAX requests, redirect to the referring page if possible
-    referer = request.META.get('HTTP_REFERER')
-    if referer:
-        return redirect(referer)
-    
-    return redirect('product_detail', slug=product.slug)
+    except Exception as e:
+        # Log the error (in production, use a proper logger)
+        print(f"Error in add_to_wishlist: {e}")
+        
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'status': 'error',
+                'message': "An error occurred. Please try again.",
+            }, status=500)
+            
+        messages.error(request, "An error occurred. Please try again.")
+        return redirect('product_list')
 
 @login_required
 def remove_from_wishlist(request, product_id):
