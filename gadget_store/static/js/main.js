@@ -1,6 +1,80 @@
 /* static/js/main.js */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Add to cart AJAX functionality
+    const addToCartLinks = document.querySelectorAll('a[href^="/cart/add/"]');
+    addToCartLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Create a form to submit the data
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = this.href;
+            
+            // Add CSRF token
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = document.querySelector('#csrf-form input[name="csrfmiddlewaretoken"]').value;
+            form.appendChild(csrfInput);
+            
+            // Add quantity
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = 'quantity';
+            quantityInput.value = '1';
+            form.appendChild(quantityInput);
+            
+            // Submit the form with AJAX
+            const formData = new FormData(form);
+            fetch(this.href, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Update cart badge
+                const cartBadge = document.querySelector('.navbar .fa-shopping-cart').nextElementSibling;
+                if (data.cart_count > 0) {
+                    if (cartBadge) {
+                        cartBadge.textContent = data.cart_count;
+                    } else {
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'badge rounded-pill bg-danger';
+                        newBadge.textContent = data.cart_count;
+                        document.querySelector('.navbar .fa-shopping-cart').after(newBadge);
+                    }
+                }
+                
+                // Show success message
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                alertDiv.innerHTML = '<strong>Success!</strong> Item added to your cart.' +
+                    '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+                document.querySelector('main').prepend(alertDiv);
+                
+                // Update button text to "Add More"
+                this.textContent = 'Add More';
+                
+                // Automatically close the alert after 3 seconds
+                setTimeout(() => {
+                    const alert = document.querySelector('.alert');
+                    if (alert) {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }
+                }, 3000);
+            })
+            .catch(error => {
+                console.error('Error adding to cart:', error);
+            });
+        });
+    });
+
     // Add fade-in animation to main content
     const mainContent = document.querySelector('main');
     if (mainContent) {

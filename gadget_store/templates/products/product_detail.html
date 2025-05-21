@@ -78,7 +78,12 @@
           </div>
           <div class="col-auto">
             <button type="submit" class="btn btn-primary" {% if product.stock < 1 %}disabled{% endif %}>
-              <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+              <i class="fas fa-shopping-cart me-2"></i>
+              {% if product.id in in_cart_products %}
+                Add More
+              {% else %}
+                Add to Cart
+              {% endif %}
             </button>
           </div>
         </div>
@@ -211,7 +216,11 @@
         </div>
         <div class="card-footer bg-white border-top-0">
           <a href="{% url 'add_to_cart' related.id %}" class="btn btn-outline-primary w-100">
-            Add to Cart
+            {% if related.id in in_cart_products %}
+              Add More
+            {% else %}
+              Add to Cart
+            {% endif %}
           </a>
         </div>
       </div>
@@ -234,6 +243,65 @@
         tabTrigger.show()
       })
     })
+
+    // AJAX for add to cart
+    const addToCartForm = document.querySelector('form[action^="{% url 'add_to_cart' product.id %}"]');
+    if (addToCartForm) {
+      addToCartForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        fetch(this.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Update cart badge
+          const cartBadge = document.querySelector('.navbar .fa-shopping-cart').nextElementSibling;
+          if (data.cart_count > 0) {
+            if (cartBadge) {
+              cartBadge.textContent = data.cart_count;
+            } else {
+              const newBadge = document.createElement('span');
+              newBadge.className = 'badge rounded-pill bg-danger';
+              newBadge.textContent = data.cart_count;
+              document.querySelector('.navbar .fa-shopping-cart').after(newBadge);
+            }
+          }
+          
+          // Show success message
+          const alertDiv = document.createElement('div');
+          alertDiv.className = 'alert alert-success alert-dismissible fade show';
+          alertDiv.innerHTML = 
+            '<strong>Success!</strong> ' + '{{ product.name }}' + ' added to your cart.' +
+            '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>';
+          document.querySelector('main').prepend(alertDiv);
+          
+          // Update button text
+          const submitButton = addToCartForm.querySelector('button[type="submit"]');
+          const buttonIcon = submitButton.querySelector('i');
+          submitButton.innerHTML = '';
+          submitButton.appendChild(buttonIcon);
+          submitButton.appendChild(document.createTextNode(' Add More'));
+          
+          // Automatically close the alert after 3 seconds
+          setTimeout(() => {
+            const alert = document.querySelector('.alert');
+            if (alert) {
+              const bsAlert = new bootstrap.Alert(alert);
+              bsAlert.close();
+            }
+          }, 3000);
+        })
+        .catch(error => {
+          console.error('Error adding to cart:', error);
+        });
+      });
+    }
   });
 </script>
 {% endblock %}
