@@ -4,6 +4,66 @@
 
 {% block title %}Order History - CyberStore{% endblock %}
 
+{% block extra_css %}
+<style>
+    /* Modal z-index adjustments */
+    .modal {
+        display: none;
+        z-index: 1055;
+    }
+    
+    .modal.show {
+        display: block;
+    }
+    
+    .modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1050;
+        width: 100vw;
+        height: 100vh;
+        background-color: #000;
+    }
+    
+    .modal-backdrop.show {
+        opacity: 0.5;
+    }
+    
+    body.modal-open {
+        overflow: hidden;
+        padding-right: 0 !important;
+    }
+    
+    .modal-open .modal {
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    /* Focus outline for accessibility */
+    .modal:focus, 
+    .modal-dialog:focus,
+    .modal button:focus,
+    .modal a:focus {
+        outline: 2px solid #0d6efd;
+        outline-offset: 2px;
+    }
+
+    /* For screen readers */
+    .sr-only {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border-width: 0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <h1 class="mb-4">Order History</h1>
@@ -33,60 +93,77 @@
                                     <td>${{ order.get_total_cost }}</td>
                                     <td><span class="badge bg-primary">{{ order.get_status_display }}</span></td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#orderModal{{ order.id }}">
-                                            <i class="fas fa-eye me-1"></i>View
+                                        <button type="button" class="btn btn-sm btn-outline-primary order-detail-btn" data-order-id="{{ order.id }}" aria-label="View details for order #{{ order.id }}">
+                                            <i class="fas fa-eye me-1" aria-hidden="true"></i>View
                                         </button>
                                         
                                         <!-- Order Details Modal -->
-                                        <div class="modal fade" id="orderModal{{ order.id }}" tabindex="-1" aria-hidden="true">
-                                            <div class="modal-dialog modal-lg">
+                                        <div class="modal" id="orderModal{{ order.id }}_{{ forloop.counter }}" tabindex="-1" aria-labelledby="orderModalLabel{{ order.id }}_{{ forloop.counter }}" aria-hidden="true" role="dialog">
+                                            <div class="modal-dialog modal-lg" role="document">
                                                 <div class="modal-content">
                                                     <div class="modal-header">
-                                                        <h5 class="modal-title">Order #{{ order.id }} Details</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        <h5 class="modal-title" id="orderModalLabel{{ order.id }}_{{ forloop.counter }}">Order #{{ order.id }} Details</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" aria-describedby="closeModalDescription{{ order.id }}_{{ forloop.counter }}">
+                                                            <span class="sr-only" id="closeModalDescription{{ order.id }}_{{ forloop.counter }}">Close order details</span>
+                                                        </button>
                                                     </div>
                                                     <div class="modal-body">
-                                                        <div class="row">
+                                                        <div class="row mb-4">
                                                             <div class="col-md-6">
-                                                                <h6>Order Information</h6>
-                                                                <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
-                                                                <p><strong>Status:</strong> <span class="badge bg-primary">{{ order.get_status_display }}</span></p>
-                                                                <p><strong>Total:</strong> ${{ order.get_total_cost }}</p>
+                                                                <div class="card h-100">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title">Order Information</h6>
+                                                                        <p class="mb-2"><strong>Date:</strong> {{ order.created_at|date:"F j, Y" }}</p>
+                                                                        <p class="mb-2"><strong>Status:</strong> <span class="badge bg-primary">{{ order.get_status_display }}</span></p>
+                                                                        <p class="mb-0"><strong>Total:</strong> ${{ order.get_total_cost }}</p>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                             <div class="col-md-6">
-                                                                <h6>Shipping Information</h6>
-                                                                <p><strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}</p>
-                                                                <p><strong>Address:</strong> {{ order.address }}</p>
-                                                                <p><strong>City:</strong> {{ order.city }}, {{ order.state }} {{ order.zip_code }}</p>
+                                                                <div class="card h-100">
+                                                                    <div class="card-body">
+                                                                        <h6 class="card-title">Shipping Information</h6>
+                                                                        <p class="mb-2"><strong>Name:</strong> {{ order.first_name }} {{ order.last_name }}</p>
+                                                                        <p class="mb-2"><strong>Address:</strong> {{ order.address }}</p>
+                                                                        <p class="mb-0"><strong>City:</strong> {{ order.city }}, {{ order.state }} {{ order.zip_code }}</p>
+                                                                    </div>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                        <hr>
-                                                        <h6>Order Items</h6>
+                                                        <h6 class="mb-3">Order Items</h6>
                                                         <div class="table-responsive">
-                                                            <table class="table">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th>Product</th>
-                                                                        <th>Price</th>
-                                                                        <th>Quantity</th>
-                                                                        <th>Total</th>
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    {% for item in order.items.all %}
+                                                            {% if order.items.all %}
+                                                                <table class="table table-bordered table-striped">
+                                                                    <thead class="table-light">
                                                                         <tr>
-                                                                            <td>{{ item.product.name }}</td>
-                                                                            <td>${{ item.price }}</td>
-                                                                            <td>{{ item.quantity }}</td>
-                                                                            <td>${{ item.get_cost }}</td>
+                                                                            <th>Product</th>
+                                                                            <th>Price</th>
+                                                                            <th>Quantity</th>
+                                                                            <th>Total</th>
                                                                         </tr>
-                                                                    {% endfor %}
-                                                                </tbody>
-                                                            </table>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        {% for item in order.items.all %}
+                                                                            <tr>
+                                                                                <td>{{ item.product.name }}</td>
+                                                                                <td>${{ item.price }}</td>
+                                                                                <td>{{ item.quantity }}</td>
+                                                                                <td>${{ item.get_cost }}</td>
+                                                                            </tr>
+                                                                        {% endfor %}
+                                                                        <tr class="table-primary">
+                                                                            <td colspan="3" class="text-end fw-bold">Order Total:</td>
+                                                                            <td class="fw-bold">${{ order.get_total_cost }}</td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            {% else %}
+                                                                <div class="alert alert-info">No items found for this order.</div>
+                                                            {% endif %}
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                        <button type="button" class="btn btn-secondary close-modal" data-order-id="{{ order.id }}" data-modal-id="{{ forloop.counter }}">Close</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -105,4 +182,248 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Check if Bootstrap is available
+        const isBootstrapAvailable = typeof bootstrap !== 'undefined' && typeof bootstrap.Modal === 'function';
+        
+        // Store event handler references for proper removal
+        const detailButtonHandlers = new Map();
+        const closeButtonHandlers = new Map();
+        
+        // Focus trap elements for accessibility
+        let lastFocusedElementBeforeModal;
+        const focusableElementsString = 'a[href], button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])';
+        
+        // Clean up any existing modal instances
+        const cleanupModals = function() {
+            const modalElements = document.querySelectorAll('.modal');
+            if (isBootstrapAvailable) {
+                modalElements.forEach(function(modalEl) {
+                    try {
+                        const modalInstance = bootstrap.Modal.getInstance(modalEl);
+                        if (modalInstance) {
+                            modalInstance.dispose();
+                        }
+                    } catch (error) {
+                        console.warn('Error disposing Bootstrap modal:', error);
+                    }
+                });
+            }
+            
+            // Remove any existing backdrops
+            const existingBackdrops = document.querySelectorAll('.modal-backdrop');
+            existingBackdrops.forEach(function(backdrop) {
+                backdrop.remove();
+            });
+        };
+        
+        // Clean up existing modals
+        cleanupModals();
+        
+        // Setup focus trap for modals
+        const trapFocus = function(modal) {
+            const focusableElements = modal.querySelectorAll(focusableElementsString);
+            const firstFocusableElement = focusableElements[0];
+            const lastFocusableElement = focusableElements[focusableElements.length - 1];
+            
+            // Set focus to first element
+            setTimeout(() => {
+                firstFocusableElement.focus();
+            }, 50);
+            
+            // Handle tab and shift+tab to trap focus
+            modal.addEventListener('keydown', function(e) {
+                if (e.key === 'Tab') {
+                    if (e.shiftKey) {
+                        if (document.activeElement === firstFocusableElement) {
+                            e.preventDefault();
+                            lastFocusableElement.focus();
+                        }
+                    } else {
+                        if (document.activeElement === lastFocusableElement) {
+                            e.preventDefault();
+                            firstFocusableElement.focus();
+                        }
+                    }
+                }
+            });
+        };
+        
+        // Handle opening modal
+        const handleDetailButtonClick = function(e) {
+            e.preventDefault();
+            
+            // Store the last focused element
+            lastFocusedElementBeforeModal = document.activeElement;
+            
+            // Remove all existing backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+            
+            // Hide any open modals
+            document.querySelectorAll('.modal.show').forEach(function(modal) {
+                modal.classList.remove('show');
+                modal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+            });
+            
+            // Get order ID from data attribute
+            const orderId = this.getAttribute('data-order-id');
+            const buttonElement = this;
+            
+            // Find the correct modal for this button
+            let modalToShow = null;
+            document.querySelectorAll(`.modal[id^="orderModal${orderId}_"]`).forEach(function(modalEl) {
+                if (!modalToShow && modalEl.closest('tr') === buttonElement.closest('tr')) {
+                    modalToShow = modalEl;
+                }
+            });
+            
+            if (!modalToShow) return;
+            
+            // If Bootstrap is available, use it
+            if (isBootstrapAvailable) {
+                try {
+                    const bsModal = new bootstrap.Modal(modalToShow);
+                    bsModal.show();
+                } catch (error) {
+                    console.warn('Error showing Bootstrap modal:', error);
+                    // Fallback to manual implementation
+                    showModalManually(modalToShow);
+                }
+            } else {
+                // Manual implementation
+                showModalManually(modalToShow);
+            }
+            
+            // Set up focus trap
+            trapFocus(modalToShow);
+        };
+        
+        // Manual modal display
+        const showModalManually = function(modal) {
+            modal.style.display = 'block';
+            modal.classList.add('show');
+            
+            // Create backdrop manually
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop show';
+            document.body.appendChild(backdrop);
+            
+            // Add modal-open class to body
+            document.body.classList.add('modal-open');
+        };
+        
+        // Handle closing modal
+        const handleCloseButtonClick = function(e) {
+            e.preventDefault();
+            
+            let modalToClose;
+            if (this.classList.contains('close-modal')) {
+                const orderId = this.getAttribute('data-order-id');
+                const modalId = this.getAttribute('data-modal-id');
+                modalToClose = document.getElementById(`orderModal${orderId}_${modalId}`);
+            } else {
+                modalToClose = this.closest('.modal');
+            }
+            
+            if (!modalToClose) return;
+            
+            // If Bootstrap is available, use it
+            if (isBootstrapAvailable) {
+                try {
+                    const bsModal = bootstrap.Modal.getInstance(modalToClose);
+                    if (bsModal) {
+                        bsModal.hide();
+                    } else {
+                        // Fallback if instance not found
+                        hideModalManually(modalToClose);
+                    }
+                } catch (error) {
+                    console.warn('Error hiding Bootstrap modal:', error);
+                    // Fallback to manual implementation
+                    hideModalManually(modalToClose);
+                }
+            } else {
+                // Manual implementation
+                hideModalManually(modalToClose);
+            }
+            
+            // Return focus to the element that opened the modal
+            if (lastFocusedElementBeforeModal) {
+                setTimeout(() => {
+                    lastFocusedElementBeforeModal.focus();
+                }, 50);
+            }
+        };
+        
+        // Manual modal hiding
+        const hideModalManually = function(modal) {
+            modal.classList.remove('show');
+            modal.style.display = 'none';
+            
+            // Remove backdrops
+            document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
+                backdrop.remove();
+            });
+            
+            // Remove modal-open class from body
+            document.body.classList.remove('modal-open');
+        };
+        
+        // Set up detail button click handlers
+        const detailButtons = document.querySelectorAll('.order-detail-btn');
+        detailButtons.forEach(function(button) {
+            // Remove old handler if exists
+            const oldHandler = detailButtonHandlers.get(button);
+            if (oldHandler) {
+                button.removeEventListener('click', oldHandler);
+            }
+            
+            // Add new handler
+            button.addEventListener('click', handleDetailButtonClick);
+            detailButtonHandlers.set(button, handleDetailButtonClick);
+        });
+        
+        // Set up close button handlers
+        const closeButtons = document.querySelectorAll('.close-modal, .modal .btn-close');
+        closeButtons.forEach(function(button) {
+            // Remove old handler if exists
+            const oldHandler = closeButtonHandlers.get(button);
+            if (oldHandler) {
+                button.removeEventListener('click', oldHandler);
+            }
+            
+            // Add new handler
+            button.addEventListener('click', handleCloseButtonClick);
+            closeButtonHandlers.set(button, handleCloseButtonClick);
+        });
+        
+        // Close modal when clicking on backdrop
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal') && e.target.classList.contains('show')) {
+                const closeButton = e.target.querySelector('.btn-close');
+                if (closeButton) {
+                    handleCloseButtonClick.call(closeButton, e);
+                }
+            }
+        });
+        
+        // Close modal with escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const openModal = document.querySelector('.modal.show');
+                if (openModal) {
+                    const closeButton = openModal.querySelector('.btn-close');
+                    if (closeButton) {
+                        handleCloseButtonClick.call(closeButton, e);
+                    }
+                }
+            }
+        });
+    });
+</script>
 {% endblock %}
