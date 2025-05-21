@@ -285,12 +285,12 @@
                     <!-- Tabs -->
                     <ul class="nav nav-tabs mb-4" id="authTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">
+                            <button class="nav-link {% if active_tab != 'register' %}active{% endif %}" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab" aria-controls="login" aria-selected="true">
                                 Sign In
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">
+                            <button class="nav-link {% if active_tab == 'register' %}active{% endif %}" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab" aria-controls="register" aria-selected="false">
                                 Create Account
                             </button>
                         </li>
@@ -299,7 +299,7 @@
                     <!-- Tab content -->
                     <div class="tab-content" id="authTabContent">
                         <!-- Login Tab -->
-                        <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                        <div class="tab-pane fade {% if active_tab != 'register' %}show active{% endif %}" id="login" role="tabpanel" aria-labelledby="login-tab">
                             <form id="loginForm" class="needs-validation" method="POST" action="{% url 'auth' %}" novalidate>
                                 {% csrf_token %}
                                 
@@ -371,8 +371,8 @@
                         </div>
                         
                         <!-- Register Tab -->
-                        <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-                            <form method="post" id="registerForm" class="needs-validation" novalidate>
+                        <div class="tab-pane fade {% if active_tab == 'register' %}show active{% endif %}" id="register" role="tabpanel" aria-labelledby="register-tab">
+                            <form method="post" action="{% url 'auth' %}" id="registerForm" class="needs-validation" novalidate>
                                 {% csrf_token %}
                                 <div class="row">
                                     <div class="col-md-6 mb-3">

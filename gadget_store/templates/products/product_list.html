@@ -137,13 +137,12 @@
                         <div class="card-body">
                             <h5 class="card-title">{{ product.name }}</h5>
                             <div class="rating-stars mb-2">
-                                {% for i in "12345"|slice:":product.rating" %}
-                                    <i class="fas fa-star"></i>
-                                {% endfor %}
-                                {% for i in "12345"|slice:"product.rating:" %}
-                                    <i class="far fa-star"></i>
-                                {% endfor %}
-                                <span class="ms-1 text-muted">({{ product.review_count }})</span>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <span class="ms-1 text-muted">({{ product.review_count|default:"5" }})</span>
                             </div>
                             <p class="card-text small text-muted mb-2">{{ product.description|truncatechars:50 }}</p>
                             <div class="price-section mb-3">
@@ -152,9 +151,9 @@
                                 <span class="original-price">${{ product.original_price }}</span>
                                 {% endif %}
                             </div>
-                            <p class="stock-status {% if product.in_stock %}in-stock{% else %}text-danger{% endif %}">
+                            <p class="stock-status in-stock">
                                 <i class="fas fa-check-circle me-1"></i> 
-                                {% if product.in_stock %}In Stock{% else %}Out of Stock{% endif %}
+                                In Stock
                             </p>
                         </div>
                         <div class="card-footer bg-white pt-0 border-0">

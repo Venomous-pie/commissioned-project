@@ -33,6 +33,12 @@ def auth_view(request):
                 for field, errors in register_form.errors.items():
                     for error in errors:
                         messages.error(request, f"{field}: {error}")
+                # Don't redirect, return the form with errors
+                return render(request, 'users/auth.html', {
+                    'register_form': register_form,
+                    'login_form': login_form,
+                    'active_tab': 'register'  # Add this to indicate the register tab should be active
+                })
 
         elif 'login-submit' in request.POST:
             login_form = UserLoginForm(request.POST, prefix='login')
@@ -50,7 +56,8 @@ def auth_view(request):
                         login_form.add_error('username_login', 'No account found with this username or email.')
                         return render(request, 'users/auth.html', {
                             'register_form': register_form,
-                            'login_form': login_form
+                            'login_form': login_form,
+                            'active_tab': 'login'  # Add this to indicate the login tab should be active
                         })
 
                 if user_obj:
@@ -78,13 +85,28 @@ def auth_view(request):
                         return redirect(next_url if next_url else '/')
                     else:
                         login_form.add_error('password_login', 'Incorrect password. Please try again.')
+                        return render(request, 'users/auth.html', {
+                            'register_form': register_form,
+                            'login_form': login_form,
+                            'active_tab': 'login'  # Add this to indicate the login tab should be active
+                        })
                 else:
                     login_form.add_error('username_login', 'No account found with this username or email.')
+                    return render(request, 'users/auth.html', {
+                        'register_form': register_form,
+                        'login_form': login_form,
+                        'active_tab': 'login'  # Add this to indicate the login tab should be active
+                    })
 
             else:
                 for field, errors in login_form.errors.items():
                     for error in errors:
                         messages.error(request, f"{field}: {error}")
+                return render(request, 'users/auth.html', {
+                    'register_form': register_form,
+                    'login_form': login_form,
+                    'active_tab': 'login'  # Add this to indicate the login tab should be active
+                })
 
     return render(request, 'users/auth.html', {
         'register_form': register_form,
