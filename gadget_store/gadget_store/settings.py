@@ -9,7 +9,7 @@ SECRET_KEY = 'tgiug7wrfay903ywyr9t94TB*rt8RE8r*er86RT*&IYTBH(&%t7tir^eU^rE&^R8uR
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*", "cyberstore-n03u.onrender.com"]
 
 # Application definition
 INSTALLED_APPS = [
