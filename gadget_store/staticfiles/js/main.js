@@ -1,0 +1,136 @@
+/* static/js/main.js */
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Add fade-in animation to main content
+    const mainContent = document.querySelector('main');
+    if (mainContent) {
+        mainContent.classList.add('fade-in');
+    }
+    
+    // Add slide-in-up animation to product cards
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.classList.add('slide-in-up');
+        }, index * 100); // Stagger the animations
+    });
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Auto-hide alerts after 5 seconds
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 5000);
+    });
+    
+    // Add to cart animation
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            const productCard = this.closest('.product-card');
+            if (productCard) {
+                productCard.classList.add('animate__animated', 'animate__pulse');
+                setTimeout(() => {
+                    productCard.classList.remove('animate__animated', 'animate__pulse');
+                }, 1000);
+            }
+        });
+    });
+    
+    // Quantity input validation
+    const quantityInputs = document.querySelectorAll('input[type="number"]');
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', function() {
+            if (this.value < 1) {
+                this.value = 1;
+            }
+        });
+    });
+    
+    // Wishlist toggle animation
+    const wishlistButtons = document.querySelectorAll('.wishlist-btn');
+    wishlistButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const icon = this.querySelector('i');
+            if (icon.classList.contains('far')) {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                icon.classList.add('text-danger');
+            } else {
+                icon.classList.remove('fas');
+                icon.classList.remove('text-danger');
+                icon.classList.add('far');
+            }
+        });
+    });
+
+    // Search Suggestions
+    const searchInput = document.querySelector('.search-input');
+    const suggestionsContainer = document.querySelector('.search-suggestions');
+    let debounceTimer;
+
+    // Show suggestions container when input is focused
+    searchInput.addEventListener('focus', function() {
+        if (this.value.length >= 2) {
+            suggestionsContainer.style.display = 'block';
+        }
+    });
+
+    // Hide suggestions container when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.search-container')) {
+            suggestionsContainer.style.display = 'none';
+        }
+    });
+
+    // Handle input changes
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const query = this.value.trim();
+
+        if (query.length < 2) {
+            suggestionsContainer.style.display = 'none';
+            return;
+        }
+
+        // Debounce the API call
+        debounceTimer = setTimeout(() => {
+            fetch(`/search-suggestions/?q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.suggestions.length > 0) {
+                        suggestionsContainer.innerHTML = data.suggestions.map(product => `
+                            <a href="${product.url}" class="suggestion-item text-decoration-none">
+                                <img src="${product.image_url}" alt="${product.name}" class="suggestion-img">
+                                <div class="suggestion-content">
+                                    <div class="suggestion-title">${product.name}</div>
+                                    <div class="suggestion-category">${product.category}</div>
+                                </div>
+                                <div class="suggestion-price">$${product.price}</div>
+                            </a>
+                        `).join('');
+                        suggestionsContainer.style.display = 'block';
+                    } else {
+                        suggestionsContainer.innerHTML = `
+                            <div class="suggestion-item">
+                                <div class="suggestion-content">
+                                    <div class="suggestion-title text-muted">No products found</div>
+                                </div>
+                            </div>
+                        `;
+                        suggestionsContainer.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching suggestions:', error);
+                });
+        }, 300); // Wait 300ms after user stops typing
+    });
+});
