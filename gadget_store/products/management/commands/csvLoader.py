@@ -53,10 +53,9 @@ class Command(BaseCommand):
                     is_featured=False,
                 )
 
-                image_url = row.get('imageUrl')
-                if image_url:
+                if row.get('imageUrl'):
                     try:
-                        response = requests.get(image_url)
+                        response = requests.get(row['imageUrl'])
                         if response.status_code == 200:
                             img_name = f"{product_slug}.jpg"
                             product.image.save(img_name, ContentFile(response.content), save=True)
