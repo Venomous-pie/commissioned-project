@@ -5,7 +5,7 @@ import dj_database_url
 # ----------------------------------------------------------
 # BASE & ENVIRONMENT SETTINGS
 # ----------------------------------------------------------
-DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://cyberstore_user:gm3UBX8NNVroOl44sDqs6AIlJP8lCayf@dpg-d0n18nmmcj7s73944f20-a/cyberstore')
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://cyberstore_8101_user:5ZjLGC00uiBSe7zFzVLkpxZ0zygqFgH2@dpg-d0ogf66uk2gs738lnap0-a/cyberstore_8101')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
