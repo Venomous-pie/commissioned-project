@@ -23,11 +23,18 @@ class Command(BaseCommand):
             for row in reader:
                 category_name = row.get('category', 'Uncategorized')
                 category, _ = Category.objects.get_or_create(name=category_name, slug=slugify(category_name))
+                
+                product_slug = slugify(row['title'])
 
+                # Check if product with this slug already exists
+                if Product.objects.filter(slug=product_slug).exists():
+                    self.stdout.write(self.style.WARNING(f"Product '{row['title']}' already exists. Skipping."))
+                    continue  # Skip to next row
+                
                 product = Product.objects.create(
                     category=category,
                     name=row['title'],
-                    slug=slugify(row['title']),
+                    slug=product_slug,
                     description=row.get('description', ''),
                     brand=row.get('brand', ''),
                     price=row.get('price', 0),
@@ -46,16 +53,14 @@ class Command(BaseCommand):
                     is_featured=False,
                 )
 
-                # Download image from dummy URL and assign to ImageField
-                image_url = row.get('imageUrl')
                 image_url = row.get('imageUrl')
                 if image_url:
                     try:
                         response = requests.get(image_url)
                         if response.status_code == 200:
-                            img_name = f"{slugify(row['title'])}.jpg"
+                            img_name = f"{product_slug}.jpg"
                             product.image.save(img_name, ContentFile(response.content), save=True)
                     except Exception as e:
-                        self.stdout.write(self.style.WARNING(f"Image failed: {e}"))
+                        self.stdout.write(self.style.WARNING(f"Image failed for '{row['title']}': {e}"))
 
         self.stdout.write(self.style.SUCCESS('Products loaded from CSV.'))
