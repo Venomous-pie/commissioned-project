@@ -5,6 +5,8 @@ import dj_database_url
 # ----------------------------------------------------------
 # BASE & ENVIRONMENT SETTINGS
 # ----------------------------------------------------------
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://cyberstore_user:gm3UBX8NNVroOl44sDqs6AIlJP8lCayf@dpg-d0n18nmmcj7s73944f20-a/cyberstore')
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Secret key should be stored in an environment variable in production
@@ -14,11 +16,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'tgiug7wrfay903ywyr9t94TB*rt8RE8r*er86
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # Hosts
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'cyberstore-n03u.onrender.com',  # your Render service URL
-]
+ALLOWED_HOSTS = ["*", "cyberstore-n03u.onrender.com"]
 
 # ----------------------------------------------------------
 # Applications & Middleware
@@ -59,7 +57,7 @@ ROOT_URLCONF = 'gadget_store.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,13 +82,22 @@ WSGI_APPLICATION = 'gadget_store.wsgi.application'
 # Render automatically provides DATABASE_URL env var
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=DATABASE_URL,
-        conn_max_age=600,
-        ssl_require=not DEBUG,
-    )
-}
+if DEBUG:
+    # Use SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+else:
+    # Use PostgreSQL in production (on Render)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+        )
+    }
 
 # ----------------------------------------------------------
 # Password validation
@@ -114,12 +121,12 @@ USE_TZ = True
 # Static & Media files
 # ----------------------------------------------------------
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # ----------------------------------------------------------
 # Security settings for production
