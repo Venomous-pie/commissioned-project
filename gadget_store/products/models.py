@@ -37,7 +37,7 @@ class Product(models.Model):
     sku = models.CharField(max_length=500, blank=True)
     weight = models.FloatField(default=0.0)
     dimensions = models.CharField(max_length=500, blank=True)
-    thumbnail_url = models.URLField(blank=True)
+    thumbnail_url = models.URLField(max_length=500, blank=True)
     is_featured = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
