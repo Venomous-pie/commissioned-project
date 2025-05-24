@@ -192,7 +192,7 @@
     <div class="col-md-3 mb-4">
       <div class="card h-100">
         <a href="{% url 'product_detail' related.slug %}">
-          <img src="{{ related.image.url }}" class="card-img-top p-3" alt="{{ related.name }}">
+          <img src="{{ related.thumbnail_url }}" class="card-img-top p-3" alt="{{ related.name }}">
         </a>
         <div class="card-body">
           <h5 class="card-title">
