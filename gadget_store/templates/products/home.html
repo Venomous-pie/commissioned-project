@@ -481,7 +481,7 @@
                     <span class="badge bg-primary featured-badge">Featured</span>
                     {% endif %}
                     <div class="product-card-image-container">
-                        <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        <img src="{{ product.thumbnail_url }}" class="card-img-top" alt="{{ product.name }}">
                         <a href="{% url 'product_detail' product.slug %}" class="quick-view-overlay">
                             <span class="quick-view-text">Quick View</span>
                         </a>

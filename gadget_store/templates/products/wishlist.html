@@ -19,7 +19,7 @@
                 {% if item.product.featured %}
                 <span class="badge bg-primary featured-badge">Featured</span>
                 {% endif %}
-                <img src="{{ item.product.image.url }}" class="card-img-top" alt="{{ item.product.name }}">
+                <img src="{{ item.product.thumbnail_url }}" class="card-img-top" alt="{{ item.product.name }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ item.product.name }}</h5>
                     <div class="rating-stars mb-2">
